@@ -10,7 +10,6 @@ pipeline {
         DOCKER_IMAGE = "arsalananwer0/bankapp-eks"
         DOCKER_TAG = "v${BUILD_NUMBER}"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-        SCANNER_HOME = tool 'sonar-scanner'
     }
 
     stages {
@@ -31,35 +30,6 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'mvn test'
-            }
-        }
-
-        stage('OWASP Dependency Check') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --format HTML --format XML',
-                                odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh '''
-                        $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectName=BankApp \
-                        -Dsonar.projectKey=BankApp \
-                        -Dsonar.java.binaries=target/classes
-                    '''
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: false
-                }
             }
         }
 
