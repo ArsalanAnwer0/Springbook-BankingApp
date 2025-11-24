@@ -9,7 +9,7 @@ RUN mvn clean install -DskipTests=true
 
 # Stage 2: Create the runtime image
 
-FROM maven:3.8.3-alpine-slim AS runtime
+FROM maven:3.8.3-openjdk-17 AS runtime
 
 COPY --from=build /src/target/*.jar /src/target/bankapp.jar
 
