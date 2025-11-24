@@ -1,17 +1,13 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'JDK17'
-        maven 'Maven3'
-    }
-
     environment {
         DOCKER_IMAGE = "arsalananwer0/bankapp-eks"
         DOCKER_TAG = "v${BUILD_NUMBER}"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
         JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+        MAVEN_HOME = '/usr/share/maven'
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
     }
 
     stages {
