@@ -5,83 +5,107 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to right, #000000, #ffd700);
-            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            flex-direction: column;
+            min-height: 100vh;
         }
 
         .navbar-custom {
-            background-color: rgba(0, 0, 0, 0.7);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        .navbar-custom a {
-            color: #ffffff !important;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 1rem 2rem;
         }
 
         .navbar-custom .navbar-brand {
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #333333;
         }
 
-        .container {
+        .navbar-custom .nav-link {
+            color: #666666;
+            font-weight: 500;
+        }
+
+        .navbar-custom .nav-link:hover {
+            color: #4285f4;
+        }
+
+        .transactions-container {
             max-width: 1000px;
-            margin-top: 80px; /* Reduced margin for the table to be closer to the top */
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
             text-align: center;
         }
 
-        h2 {
-            margin-bottom: 20px;
+        .page-header h2 {
+            color: #333333;
+            font-weight: 600;
+            margin: 0;
         }
 
-        .table-custom {
-            background-color: rgba(0, 0, 0, 0.8); /* Darker background for better contrast */
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            overflow-x: auto; /* Ensures table is responsive */
+        .table-container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
         }
 
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(255, 255, 255, 0.1); /* Slightly lighter row color */
+        .table {
+            margin-bottom: 0;
         }
 
-        .table-striped td, .table-striped th {
-            color: #ffffff; /* White text color for visibility */
-            font-weight: bold; /* Bolder text for readability */
-            padding: 15px; /* Increase padding for better spacing */
-            border-bottom: 1px solid #ffd700; /* Yellow border for rows */
+        .table thead th {
+            background-color: #f8f9fa;
+            color: #333333;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+            padding: 15px;
         }
 
-        .table-striped th {
-            background-color: rgba(255, 215, 0, 0.2); /* Light golden background for headers */
+        .table tbody td {
+            color: #666666;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
         }
 
         .text-success {
-            color: #28a745 !important;
+            color: #34a853 !important;
+            font-weight: 600;
         }
 
         .text-danger {
-            color: #dc3545 !important;
+            color: #ea4335 !important;
+            font-weight: 600;
         }
 
-        .custom-link {
-            color: #ffd700;
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #4285f4;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 500;
         }
 
-        .custom-link:hover {
-            color: #ffecb3;
+        .back-link a:hover {
             text-decoration: underline;
         }
     </style>
@@ -96,33 +120,39 @@
     </ul>
 </nav>
 
-<div class="container">
-    <h2 class="text-center">Transaction History</h2>
-    <div class="table-responsive table-custom">
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Date</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="transaction : ${transactions}">
-                <td th:text="${transaction.id}"></td>
-                <td th:text="${transaction.type}"></td>
-                <td th:text="${transaction.amount}"
-                    th:classappend="${transaction.type.contains('Transfer In') || transaction.type == 'Deposit'} ? 'text-success' : 'text-danger'">
-                    <span th:text="${transaction.type.contains('Transfer In') || transaction.type == 'Deposit'} ? '+$' + transaction.amount : '-$' + transaction.amount"></span>
-                </td>
-                <td th:text="${transaction.timestamp}"></td>
-            </tr>
-            </tbody>
-        </table>
+<div class="container transactions-container">
+    <div class="page-header">
+        <h2>Transaction History</h2>
     </div>
 
-    <p class="text-center"><a href="/dashboard" class="custom-link">Back to Dashboard</a></p>
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="transaction : ${transactions}">
+                    <td th:text="${transaction.id}"></td>
+                    <td th:text="${transaction.type}"></td>
+                    <td th:classappend="${transaction.type.contains('Transfer In') || transaction.type == 'Deposit'} ? 'text-success' : 'text-danger'">
+                        <span th:text="${transaction.type.contains('Transfer In') || transaction.type == 'Deposit'} ? '+$' + transaction.amount : '-$' + transaction.amount"></span>
+                    </td>
+                    <td th:text="${transaction.timestamp}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a href="/dashboard">Back to Dashboard</a>
+    </div>
 </div>
 
 </body>
