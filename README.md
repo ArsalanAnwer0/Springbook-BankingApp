@@ -1,4 +1,4 @@
-# Spring Boot Banking Application - Complete DevSecOps Pipeline
+# DevSecOps CI/CD Pipeline with EKS Deployment using ArgoCD
 
 A production-ready Spring Boot banking application deployed on Amazon EKS with a complete CI/CD pipeline using Jenkins, ArgoCD, and comprehensive security scanning.
 
@@ -6,13 +6,19 @@ A production-ready Spring Boot banking application deployed on Amazon EKS with a
 
 This project demonstrates a complete DevSecOps implementation for a Spring Boot banking application, featuring:
 
-- **Application**: Spring Boot 3.3.3 banking application with MySQL database
-- **Container Orchestration**: Amazon EKS (Elastic Kubernetes Service)
-- **CI/CD Pipeline**: Jenkins with automated build, test, and deployment
-- **GitOps**: ArgoCD for automated Kubernetes deployments
-- **Security Scanning**: Trivy for container vulnerability scanning
-- **Infrastructure as Code**: Terraform for AWS infrastructure provisioning
-- **Monitoring**: Horizontal Pod Autoscaler (HPA) for auto-scaling
+**Application**: Spring Boot 3.3.3 banking application with MySQL database
+
+**Container Orchestration**: Amazon EKS (Elastic Kubernetes Service)
+
+**CI/CD Pipeline**: Jenkins with automated build, test, and deployment
+
+**GitOps**: ArgoCD for automated Kubernetes deployments
+
+**Security Scanning**: Trivy for container vulnerability scanning
+
+**Infrastructure as Code**: Terraform for AWS infrastructure provisioning
+
+**Monitoring**: Horizontal Pod Autoscaler (HPA) for auto-scaling
 
 ## Architecture
 
