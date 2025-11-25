@@ -78,6 +78,24 @@ This project demonstrates a complete DevSecOps implementation for a Spring Boot 
 - Automated manifest updates for GitOps workflow
 - Automatic cleanup and docker logout
 
+## Quick Start Guide
+
+Want to replicate this entire DevSecOps pipeline? Follow these steps:
+
+1. **Fork this repository** to your GitHub account
+2. **Provision EC2 instance** using Terraform
+3. **Create EKS cluster** with 2 node groups
+4. **Install ArgoCD** on the cluster
+5. **Install Jenkins** on EC2 instance
+6. **Install Metrics Server** for auto-scaling
+7. **Install NGINX Ingress** (optional, for external access)
+8. **Configure Jenkins pipeline** with your repository
+9. **Make code changes** and watch the magic happen!
+
+Total setup time: **~45-60 minutes** (most is waiting for EKS cluster creation)
+
+---
+
 ## Prerequisites
 
 ### Tools Required
@@ -95,7 +113,12 @@ This project demonstrates a complete DevSecOps implementation for a Spring Boot 
 - IAM role and policy management
 - VPC networking
 
-## Setup Instructions
+### Accounts Needed
+- AWS Account with appropriate permissions
+- DockerHub account (for pushing images)
+- GitHub account (for forking repository)
+
+## Complete Setup Instructions
 
 ### 1. Infrastructure Setup
 
@@ -275,7 +298,58 @@ sudo usermod -aG docker jenkins
 sudo systemctl restart jenkins
 ```
 
-### 5. Install Security Tools
+#### Create Jenkins Pipeline Job
+
+1. Open Jenkins UI at `http://<EC2_PUBLIC_IP>:8080`
+2. Click "New Item" → Enter name (e.g., "bankapp-pipeline") → Select "Pipeline"
+3. Under "Pipeline" section:
+   - Definition: "Pipeline script from SCM"
+   - SCM: Git
+   - Repository URL: `https://github.com/YOUR_USERNAME/Springboot-BankingApp.git`
+   - Branch: `*/main`
+   - Script Path: `Jenkinsfile`
+4. Click "Save"
+
+### 5. Install Metrics Server
+
+The Metrics Server is required for Horizontal Pod Autoscaler (HPA) to work.
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# Verify installation
+kubectl get deployment metrics-server -n kube-system
+```
+
+### 6. Install NGINX Ingress Controller (Optional)
+
+If you want external access via domain/LoadBalancer:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml
+
+# Wait for LoadBalancer to be provisioned
+kubectl get svc ingress-nginx-controller -n ingress-nginx --watch
+
+# Get LoadBalancer URL
+kubectl get svc ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+```
+
+#### Update Ingress Manifest
+
+Update `kubernetes/bankapp-ingress.yml` with your LoadBalancer IP:
+```yaml
+spec:
+  rules:
+  - host: bankapp.<LOADBALANCER_IP>.nip.io
+```
+
+Then apply:
+```bash
+kubectl apply -f kubernetes/bankapp-ingress.yml
+```
+
+### 7. Install Security Tools
 
 ```bash
 # Install Trivy
@@ -285,6 +359,25 @@ echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main"
 sudo apt-get update
 sudo apt-get install -y trivy
 ```
+
+### 8. Update Configuration Files
+
+Before running the pipeline, update these files with your information:
+
+1. **Jenkinsfile**: Update DockerHub username
+   ```groovy
+   DOCKER_IMAGE = 'YOUR_DOCKERHUB_USERNAME/bankapp-eks'
+   ```
+
+2. **kubernetes/bankapp-deployment.yml**: Update image name
+   ```yaml
+   image: YOUR_DOCKERHUB_USERNAME/bankapp-eks:v1
+   ```
+
+3. **ArgoCD Application** (if created manually): Update repo URL
+   ```yaml
+   repoURL: 'https://github.com/YOUR_USERNAME/Springboot-BankingApp.git'
+   ```
 
 ## Deployment
 
