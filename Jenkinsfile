@@ -120,8 +120,9 @@ pipeline {
 
     post {
         always {
-            sh 'docker logout'
-            cleanWs()
+            script {
+                sh 'docker logout || true'
+            }
         }
         success {
             echo 'Pipeline executed successfully!'
